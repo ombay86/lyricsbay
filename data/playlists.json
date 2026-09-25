@@ -1,0 +1,15 @@
+[
+  {
+    "id": "pl_1",
+    "name": "Rewind 78",
+    "description": "Daftar lagu utama untuk acara Talent Show",
+    "songIds": [
+      "song_1",
+      "song_2",
+      "song_3",
+      "song_4",
+      "song_5"
+    ],
+    "createdAt": "2026-09-25T07:01:22.513Z"
+  }
+]

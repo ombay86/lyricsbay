@@ -1,0 +1,11 @@
+{
+  "fontFamily": "Poppins",
+  "activeFontSize": 68,
+  "inactiveOpacity": 35,
+  "activeColor": "#ffe600",
+  "strokeColor": "#000000",
+  "strokeWidth": 2,
+  "glowEnabled": true,
+  "glowColor": "#00d2ff",
+  "verticalPosition": 50
+}

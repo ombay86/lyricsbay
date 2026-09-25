@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LyricsBay - Control Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Montserrat:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Poppins:wght@600;700;800;900&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0e14;
+      --bg-header: #121722;
+      --bg-card: #161c28;
+      --bg-card-hover: #1e2638;
+      --border-color: #263043;
+      --primary: #00d2ff;
+      --primary-glow: rgba(0, 210, 255, 0.35);
+      --accent-green: #10b981;
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.35);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ----------------------------------------------------------- */
+    /* LOGIN VIEW                                                  */
+    /* ----------------------------------------------------------- */
+    #viewLogin {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, #161f30 0%, #0b0e14 100%);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      padding: 36px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .login-brand {
+      text-align: center;
+    }
+
+    .login-brand h1 {
+      font-size: 26px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00d2ff, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .login-brand p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .login-field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .login-input {
+      background: #0d111a;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .login-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    .btn-login-submit {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: none;
+      color: #fff;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+      margin-top: 4px;
+    }
+
+    .btn-login-submit:hover {
+      background: linear-gradient(135deg, #0ea5e9, #1d4ed8);
+      transform: translateY(-1px);
+    }
+
+    .login-alert {
+      display: none;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .login-hint {
+      background: rgba(0, 210, 255, 0.08);
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #93c5fd;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .login-hint:hover {
+      background: rgba(0, 210, 255, 0.15);
+    }
+
+    /* ----------------------------------------------------------- */
+    /* MAIN APP HEADER & NAV TABS                                  */
+    /* ----------------------------------------------------------- */
+    #viewApp {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .app-logo {
+      font-size: 19px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d2ff, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+    }
+
+    /* NAV TABS */
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: #0d111a;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .nav-tab-btn:hover {
+      color: #fff;
+    }
+
+    .nav-tab-btn.active {
+      background: #1e2638;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #182030;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .btn-header {
+      background: #1a2233;
+      border: 1px solid var(--border-color);
+      color: #e2e8f0;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-header:hover {
+      background: #253147;
+      color: #fff;
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+    .btn-logout:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* ----------------------------------------------------------- */
+    /* TAB CONTENT WRAPPER                                         */
+    /* ----------------------------------------------------------- */
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* ----------------------------------------------------------- */
+    /* TAB 1: LIVE CONTROLLER                                      */
+    /* ----------------------------------------------------------- */
+    .controller-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 430px;
+      gap: 16px;
+      padding: 14px 24px;
+      overflow: hidden;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .playlist-filter-bar {
+      padding: 10px 18px;
+      background: #111622;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .playlist-select {
+      background: #0a0d14;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .song-select-bar {
+      padding: 12px 18px;
+      background: #151a24;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .song-dropdown {
+      flex: 1;
+      background: #0a0d14;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .lyrics-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      scroll-behavior: smooth;
+    }
+    .lyrics-list-container::-webkit-scrollbar { width: 8px; }
+    .lyrics-list-container::-webkit-scrollbar-thumb { background: #263043; border-radius: 4px; }
+
+    .lyric-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .lyric-item:hover { background: var(--bg-card-hover); }
+
+    .lyric-item .line-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 28px;
+      text-align: right;
+    }
+
+    .lyric-item .line-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: #cbd5e1;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .lyric-item.active {
+      background: rgba(0, 210, 255, 0.12);
+      border-color: var(--primary);
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+    .lyric-item.active .line-num { color: var(--primary); }
+    .lyric-item.active .line-text {
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .live-badge {
+      display: none;
+      padding: 2px 8px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      animation: pulse 1.5s infinite;
+    }
+    .lyric-item.active .live-badge { display: inline-block; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    /* CONTROLLER RIGHT PANEL */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .control-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-trigger-main {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: none;
+      color: #fff;
+      padding: 18px;
+      border-radius: 10px;
+      font-size: 19px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    }
+    .btn-trigger-main:hover {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+    }
+    .btn-trigger-main .key-hint {
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .secondary-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-ctrl {
+      background: #1e2638;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-ctrl:hover { background: #28334a; }
+    .btn-ctrl .key-hint { font-size: 10px; color: var(--text-muted); }
+
+    .btn-blank {
+      background: #1e2638;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-blank.active-blank {
+      background: var(--danger);
+      border-color: var(--danger);
+      box-shadow: 0 0 18px var(--danger-glow);
+    }
+
+    .preview-box {
+      flex: 1;
+      background: #000;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+    }
+    .preview-header {
+      background: #111622;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .preview-iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #090d14;
+    }
+
+    .shortcut-legend {
+      background: #111622;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    kbd {
+      background: #20293d;
+      border: 1px solid #32405d;
+      border-radius: 4px;
+      padding: 2px 5px;
+      color: #e2e8f0;
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    /* ----------------------------------------------------------- */
+    /* TAB 2: KELOLA LAGU (SONGS LIBRARY)                          */
+    /* ----------------------------------------------------------- */
+    .library-layout {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .library-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-input {
+      flex: 1;
+      max-width: 400px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: none;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: linear-gradient(135deg, #0ea5e9, #1d4ed8); }
+
+    .songs-table-wrap {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow-y: auto;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background: #111622;
+      padding: 12px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid var(--border-color);
+      z-index: 2;
+    }
+
+    table.data-table td {
+      padding: 12px 18px;
+      font-size: 14px;
+      border-bottom: 1px solid #1a2233;
+      color: #cbd5e1;
+    }
+
+    table.data-table tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .song-title-cell {
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-tbl-action {
+      background: #1e2638;
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-tbl-action:hover { background: #28334a; color: #fff; }
+    .btn-tbl-action.danger:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+    /* ----------------------------------------------------------- */
+    /* TAB 3: KELOLA PLAYLIST (SETLIST)                            */
+    /* ----------------------------------------------------------- */
+    .playlist-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      padding: 20px 24px;
+      overflow: hidden;
+    }
+
+    .playlist-sidebar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .playlist-sidebar-header {
+      padding: 14px 18px;
+      background: #111622;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .playlist-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .playlist-card-item {
+      padding: 12px 14px;
+      background: #111622;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .playlist-card-item:hover { background: #1a2233; }
+    .playlist-card-item.active {
+      background: rgba(0, 210, 255, 0.1);
+      border-color: var(--primary);
+    }
+    .playlist-card-item .pl-name { font-weight: 700; color: #fff; font-size: 14px; margin-bottom: 4px; }
+    .playlist-card-item .pl-info { font-size: 12px; color: var(--text-muted); }
+
+    /* Playlist Detail / Song Reordering Panel */
+    .playlist-detail-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .playlist-detail-header {
+      padding: 16px 20px;
+      background: #111622;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .playlist-songs-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pl-song-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #111622;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 16px;
+      transition: all 0.15s;
+    }
+    .pl-song-row:hover { background: #1a2233; }
+
+    .pl-song-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pl-song-num {
+      font-weight: 800;
+      color: var(--primary);
+      min-width: 24px;
+    }
+
+    .btn-icon-move {
+      background: #20293d;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+    }
+    .btn-icon-move:hover { background: #2f3c59; }
+
+    /* ----------------------------------------------------------- */
+    /* MODALS                                                      */
+    /* ----------------------------------------------------------- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+    .modal-title { font-size: 18px; font-weight: 800; color: #fff; }
+    .btn-close-modal { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+    .btn-close-modal:hover { color: #fff; }
+
+    .custom-input {
+      width: 100%;
+      background: #0d111a;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .custom-input:focus { border-color: var(--primary); }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 14px;
+    }
+
+    .btn-secondary {
+      background: #20293d;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #2b3752; }
+
+    /* Custom settings controls */
+    .setting-group { display: flex; flex-direction: column; gap: 6px; }
+    .setting-label { font-size: 13px; font-weight: 700; color: #cbd5e1; display: flex; justify-content: space-between; }
+    .setting-value-badge { color: var(--primary); font-family: monospace; }
+    .setting-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .color-picker-wrap { display: flex; align-items: center; gap: 10px; }
+    .color-input {
+      -webkit-appearance: none;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 44px;
+      height: 38px;
+      cursor: pointer;
+      background: none;
+    }
+    .color-swatches { display: flex; gap: 8px; }
+    .swatch-btn { width: 28px; height: 28px; border-radius: 6px; border: 2px solid #263043; cursor: pointer; }
+    .range-slider {
+      width: 100%;
+      height: 6px;
+      background: #20293d;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================= -->
+  <!-- 1. LOGIN SCREEN                                           -->
+  <!-- ========================================================= -->
+  <div id="viewLogin">
+    <div class="login-card">
+      <div class="login-brand">
+        <h1>🎤 LyricsBay</h1>
+        <p>Akses Masuk Operator & Visual Lyrics Control</p>
+      </div>
+
+      <div class="login-alert" id="loginAlert"></div>
+
+      <form id="formLogin" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="login-field">
+          <label for="loginUser">Username</label>
+          <input type="text" id="loginUser" class="login-input" placeholder="Masukkan username" required autofocus>
+        </div>
+
+        <div class="login-field">
+          <label for="loginPass">Password</label>
+          <input type="password" id="loginPass" class="login-input" placeholder="Masukkan password" required>
+        </div>
+
+        <button type="submit" class="btn-login-submit" id="btnLoginSubmit">Masuk ke Kontrol</button>
+      </form>
+
+      <div style="display:flex; align-items:center; gap:10px; margin: 6px 0;">
+        <div style="flex:1; height:1px; background:var(--border-color);"></div>
+        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">ATAU</span>
+        <div style="flex:1; height:1px; background:var(--border-color);"></div>
+      </div>
+
+      <a href="https://jurnalombay.my.id/sso/authorize?app=lyricsbay" id="btnSSOLogin" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; background:#0f172a; color:#38bdf8; border:1px solid #0284c7; border-radius:8px; font-weight:700; font-size:13px; text-decoration:none; transition:all 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);">
+        🌐 Masuk dengan Akun Jurnal Ombay (SSO)
+      </a>
+
+      <div class="login-hint" id="btnQuickLogin">
+        💡 <b>Klik di sini</b> untuk otomatis login cepat lokal sebagai <b>admin</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. MAIN APPLICATION                                       -->
+  <!-- ========================================================= -->
+  <div id="viewApp">
+    <!-- APP HEADER -->
+    <header>
+      <div class="header-left">
+        <div class="app-logo">🎤 LyricsBay</div>
+        
+        <!-- MAIN TABS -->
+        <nav class="nav-tabs">
+          <button class="nav-tab-btn active" data-tab="tabController">🎮 Live Controller</button>
+          <button class="nav-tab-btn" data-tab="tabSongs">🎵 Kelola Lagu</button>
+          <button class="nav-tab-btn" data-tab="tabPlaylists">📋 Kelola Playlist</button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <button class="btn-header" id="btnOpenSettings" title="Atur Font, Warna & Ukuran Overlay">
+          🎨 Setting Visual
+        </button>
+
+        <button class="btn-header" id="btnCopyUrl" title="Salin URL untuk di-paste ke Add Input > Web Browser di vMix">
+          📋 Copy vMix URL
+        </button>
+
+        <div class="user-pill">
+          <span style="color: #10b981;">●</span>
+          <span id="userNameDisplay">Admin</span>
+        </div>
+
+        <button class="btn-header btn-logout" id="btnLogout" title="Keluar dari sesi">
+          Keluar
+        </button>
+      </div>
+    </header>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- TAB 1: LIVE CONTROLLER                                  -->
+    <!-- ------------------------------------------------------- -->
+    <div class="tab-content active" id="tabController">
+      <div class="controller-layout">
+        <!-- LEFT: SONG & TELEPROMPTER -->
+        <div class="left-panel">
+          <!-- PLAYLIST SELECTOR BAR -->
+          <div class="playlist-filter-bar">
+            <span class="filter-label">Playlist Aktif:</span>
+            <select class="playlist-select" id="ctrlPlaylistSelect">
+              <!-- Populated from playlists -->
+            </select>
+          </div>
+
+          <!-- SONG SELECT BAR -->
+          <div class="song-select-bar">
+            <select class="song-dropdown" id="ctrlSongSelect">
+              <!-- Populated based on selected playlist -->
+            </select>
+          </div>
+
+          <!-- LYRICS PROMPTER LIST -->
+          <div class="lyrics-list-container" id="lyricsList"></div>
+        </div>
+
+        <!-- RIGHT: CONTROLS & MONITOR -->
+        <div class="right-panel">
+          <div class="control-card">
+            <div class="card-title">
+              <span>Live Controls</span>
+              <span id="lineCounter">Baris 0 / 0</span>
+            </div>
+
+            <button class="btn-trigger-main" id="btnNext">
+              <span>NEXT LINE ➔</span>
+              <span class="key-hint">SPASI / PANAH BAWAH / ENTER</span>
+            </button>
+
+            <div class="secondary-controls">
+              <button class="btn-ctrl" id="btnPrev">
+                <span>⬅ PREVIOUS</span>
+                <span class="key-hint">PANAH ATAS</span>
+              </button>
+              <button class="btn-ctrl" id="btnReset">
+                <span>⏮ REWIND (Awal)</span>
+                <span class="key-hint">HOME</span>
+              </button>
+            </div>
+
+            <button class="btn-blank" id="btnBlank">
+              <span id="blankLabel">👁 BLANK / HIDE TEKS</span>
+              <kbd>B</kbd>
+            </button>
+          </div>
+
+          <!-- MONITOR -->
+          <div class="preview-box">
+            <div class="preview-header">
+              <span>LIVE vMIX PREVIEW</span>
+              <span style="color: #10b981;">1080p Overlay</span>
+            </div>
+            <iframe src="/overlay" class="preview-iframe" id="previewIframe"></iframe>
+          </div>
+
+          <!-- SHORTCUTS -->
+          <div class="shortcut-legend">
+            <div><kbd>Space</kbd> / <kbd>↓</kbd> : Next Line</div>
+            <div><kbd>↑</kbd> : Prev Line</div>
+            <div><kbd>B</kbd> : Blank Display</div>
+            <div><kbd>Home</kbd> : Reset ke Baris 1</div>
+            <div><kbd>[</kbd> / <kbd>]</kbd> : Ganti Lagu</div>
+            <div><kbd>Klik Baris</kbd> : Lompat Langsung</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- TAB 2: KELOLA LAGU (SONGS LIBRARY)                      -->
+    <!-- ------------------------------------------------------- -->
+    <div class="tab-content" id="tabSongs">
+      <div class="library-layout">
+        <div class="library-toolbar">
+          <input type="text" id="searchSong" class="search-input" placeholder="🔍 Cari judul atau lirik lagu...">
+          <button class="btn-primary" id="btnOpenNewSongModal">+ Tambah Lagu Baru</button>
+        </div>
+
+        <div class="songs-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">No</th>
+                <th>Judul Lagu</th>
+                <th>Artis</th>
+                <th style="width: 120px;">Jumlah Baris</th>
+                <th style="width: 150px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="songsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- TAB 3: KELOLA PLAYLIST (SETLIST)                        -->
+    <!-- ------------------------------------------------------- -->
+    <div class="tab-content" id="tabPlaylists">
+      <div class="playlist-layout">
+        <!-- SIDEBAR: LIST OF PLAYLISTS -->
+        <div class="playlist-sidebar">
+          <div class="playlist-sidebar-header">
+            <span style="font-weight:800; font-size:14px; text-transform:uppercase;">Daftar Playlist</span>
+            <button class="btn-secondary" style="padding: 5px 10px; font-size:12px;" id="btnOpenNewPlaylistModal">+ Buat Baru</button>
+          </div>
+          <div class="playlist-list" id="playlistsContainer">
+            <!-- Playlist items rendered via JS -->
+          </div>
+        </div>
+
+        <!-- DETAIL: REORDER & MANAGE SONGS IN SELECTED PLAYLIST -->
+        <div class="playlist-detail-panel">
+          <div class="playlist-detail-header">
+            <div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <h2 id="curPlaylistTitle" style="font-size:18px; font-weight:800; color:#fff;">Talent Show - Main Setlist</h2>
+                <button class="btn-tbl-action" id="btnEditPlaylistInfo" style="padding:4px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px;" title="Ubah Nama & Deskripsi Playlist">✏️ Edit Playlist</button>
+              </div>
+              <p id="curPlaylistDesc" style="font-size:12px; color:var(--text-muted); margin-top:3px;">Daftar lagu acara</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn-secondary" id="btnAddSongToPlaylistModal">+ Tambah Lagu ke Sini</button>
+              <button class="btn-secondary btn-header-primary" id="btnSetActiveForLive" style="background:#0284c7;">🎯 Pasang di Live Show</button>
+              <button class="btn-tbl-action danger" id="btnDeleteCurrentPlaylist" title="Hapus playlist">Hapus</button>
+            </div>
+          </div>
+
+          <div class="playlist-songs-list" id="curPlaylistSongsContainer">
+            <!-- Songs with Move Up/Down/Remove buttons -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: ADD / EDIT SONG                                    -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modalSongForm">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="songModalTitle">Tambah Lagu Baru</div>
+        <button class="btn-close-modal" id="btnCloseSongModal">&times;</button>
+      </div>
+
+      <input type="hidden" id="editSongId">
+
+      <div class="setting-group">
+        <label class="setting-label">Judul Lagu *</label>
+        <input type="text" id="songFormTitle" class="custom-input" placeholder="Contoh: Terlalu Manis" required>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">Artis / Penyanyi</label>
+        <input type="text" id="songFormArtist" class="custom-input" placeholder="Contoh: Slank">
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">Lirik Lagu (Satu baris per baris tampilan) *</label>
+        <textarea id="songFormLyrics" class="custom-input" style="height:240px; resize:vertical; font-family:inherit; line-height:1.4;" placeholder="Paste lirik lagu di sini...&#10;Setiap baris akan menjadi 1 kali trigger di vMix"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnCancelSongModal">Batal</button>
+        <button class="btn-primary" id="btnSaveSongForm">Simpan Lagu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: CREATE PLAYLIST                                    -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modalPlaylistForm">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title" id="plModalTitle">Buat Playlist Baru</div>
+        <button class="btn-close-modal" id="btnClosePlaylistModal">&times;</button>
+      </div>
+
+      <input type="hidden" id="editPlaylistId">
+
+      <div class="setting-group">
+        <label class="setting-label">Nama Playlist *</label>
+        <input type="text" id="plFormName" class="custom-input" placeholder="Contoh: Sesi 2 - Akustik Malam" required>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">Deskripsi / Catatan Acara</label>
+        <input type="text" id="plFormDesc" class="custom-input" placeholder="Contoh: Rundown panggung utama">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnCancelPlaylistModal">Batal</button>
+        <button class="btn-primary" id="btnSavePlaylistForm">Simpan Playlist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: ADD SONGS TO PLAYLIST                              -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modalAddSongToPl">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">Pilih Lagu Masuk Playlist</div>
+        <button class="btn-close-modal" id="btnCloseAddSongToPl">&times;</button>
+      </div>
+      <div style="font-size:13px; color:var(--text-muted);">Pilih lagu dari perpustakaan untuk ditambahkan:</div>
+      <div id="songsToSelectContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+        <!-- Checkboxes rendered via JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnCancelAddSongToPl">Batal</button>
+        <button class="btn-primary" id="btnConfirmAddSongToPl">Tambahkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: SETTINGS FONT & WARNA                              -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modalSettings">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title">🎨 Pengaturan Font & Tampilan Overlay</div>
+        <button class="btn-close-modal" id="btnCloseSettings">&times;</button>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label" for="settingFontFamily">Jenis Huruf (Font Family)</label>
+        <select class="custom-input" id="settingFontFamily">
+          <option value="Montserrat" selected>Montserrat (Modern & Tebal - Rekomendasi)</option>
+          <option value="Poppins">Poppins (Bulat, Bersih & Ramah)</option>
+          <option value="Inter">Inter (Netral, Standar Broadcast)</option>
+          <option value="Bebas Neue">Bebas Neue (Huruf Tinggi / Condensed Caps)</option>
+          <option value="Roboto">Roboto (Padat & Jelas)</option>
+          <option value="Arial">Arial (Simpel & Universal)</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>Ukuran Font (Konsisten)</span>
+            <span class="setting-value-badge" id="lblFontSize">46px</span>
+          </div>
+          <input type="range" class="range-slider" id="settingFontSize" min="32" max="68" value="46">
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>Transparansi Baris Lain</span>
+            <span class="setting-value-badge" id="lblOpacity">35%</span>
+          </div>
+          <input type="range" class="range-slider" id="settingOpacity" min="15" max="65" value="35">
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">Warna Teks Aktif (Lirik Tengah)</div>
+        <div class="color-picker-wrap">
+          <input type="color" class="color-input" id="settingActiveColor" value="#FFFFFF">
+          <div class="color-swatches">
+            <button class="swatch-btn" style="background:#FFFFFF;" data-color="#FFFFFF"></button>
+            <button class="swatch-btn" style="background:#FFE600;" data-color="#FFE600"></button>
+            <button class="swatch-btn" style="background:#FFB800;" data-color="#FFB800"></button>
+            <button class="swatch-btn" style="background:#00F0FF;" data-color="#00F0FF"></button>
+            <button class="swatch-btn" style="background:#00FF88;" data-color="#00FF88"></button>
+            <button class="swatch-btn" style="background:#FF5376;" data-color="#FF5376"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>Garis Tepi (Stroke)</span>
+            <span class="setting-value-badge" id="lblStrokeWidth">2.2px</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="color" class="color-input" id="settingStrokeColor" value="#000000">
+            <input type="range" class="range-slider" id="settingStrokeWidth" min="0" max="4.5" step="0.5" value="2.2">
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>Efek Glow / Cahaya</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:4px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="settingGlowEnabled" checked> Aktif
+            </label>
+            <input type="color" class="color-input" id="settingGlowColor" value="#00d2ff">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnResetSettings">Reset Default</button>
+        <button class="btn-primary" id="btnApplySettings">Terapkan ke vMix</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- APPLICATION SCRIPT LOGIC                                  -->
+  <!-- ========================================================= -->
+  <script>
+    // App State
+    let authToken = localStorage.getItem('lyric_auth_token') || null;
+    let currentUser = null;
+    let songs = [];
+    let playlists = [];
+    let selectedPlaylistId = 'pl_1';
+    let filteredLiveSongs = [];
+
+    let state = {
+      currentSongIndex: 0,
+      currentLineIndex: 0,
+      isBlank: false,
+      activePlaylistId: 'pl_1',
+      settings: {
+        fontFamily: 'Montserrat',
+        activeFontSize: 46,
+        inactiveOpacity: 35,
+        activeColor: '#FFFFFF',
+        strokeColor: '#000000',
+        strokeWidth: 2.2,
+        glowEnabled: true,
+        glowColor: '#00d2ff',
+        verticalPosition: 50
+      }
+    };
+
+    // DOM Elements
+    const viewLogin = document.getElementById('viewLogin');
+    const viewApp = document.getElementById('viewApp');
+    const formLogin = document.getElementById('formLogin');
+    const loginUser = document.getElementById('loginUser');
+    const loginPass = document.getElementById('loginPass');
+    const loginAlert = document.getElementById('loginAlert');
+    const btnQuickLogin = document.getElementById('btnQuickLogin');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const btnLogout = document.getElementById('btnLogout');
+
+    // Tabs
+    const navTabBtns = document.querySelectorAll('.nav-tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Live Controller DOM
+    const ctrlPlaylistSelect = document.getElementById('ctrlPlaylistSelect');
+    const ctrlSongSelect = document.getElementById('ctrlSongSelect');
+    const lyricsList = document.getElementById('lyricsList');
+    const lineCounter = document.getElementById('lineCounter');
+    const btnNext = document.getElementById('btnNext');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnReset = document.getElementById('btnReset');
+    const btnBlank = document.getElementById('btnBlank');
+    const blankLabel = document.getElementById('blankLabel');
+    const btnCopyUrl = document.getElementById('btnCopyUrl');
+
+    // -------------------------------------------------------------
+    // AUTHENTICATION LOGIC
+    // -------------------------------------------------------------
+    async function checkAuth() {
+      // 1. Check if redirected from Jurnal Ombay SSO with ?sso_token=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const ssoToken = urlParams.get('sso_token');
+      if (ssoToken) {
+        try {
+          const ssoRes = await fetch('/api/auth/sso-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ssoToken })
+          });
+          const ssoData = await ssoRes.json();
+          if (ssoRes.ok && ssoData.success) {
+            authToken = ssoData.token;
+            currentUser = ssoData.user;
+            localStorage.setItem('lyricsbay_token', authToken);
+            // Clean URL param
+            window.history.replaceState({}, document.title, window.location.pathname);
+            showApp();
+            return;
+          }
+        } catch (e) {
+          console.error('SSO Auto Login failed:', e);
+        }
+      }
+
+      if (!authToken) {
+        showLogin();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (res.ok && data.user) {
+          currentUser = data.user;
+          showApp();
+        } else {
+          showLogin();
+        }
+      } catch (err) {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      viewLogin.style.display = 'flex';
+      viewApp.style.display = 'none';
+      loginAlert.style.display = 'none';
+    }
+
+    function showApp() {
+      viewLogin.style.display = 'none';
+      viewApp.style.display = 'flex';
+      userNameDisplay.textContent = currentUser ? currentUser.name : 'Operator';
+      loadAllData();
+    }
+
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginAlert.style.display = 'none';
+      const username = loginUser.value.trim();
+      const password = loginPass.value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          authToken = data.token;
+          currentUser = data.user;
+          localStorage.setItem('lyric_auth_token', authToken);
+          showApp();
+        } else {
+          loginAlert.textContent = data.error || 'Username atau password salah!';
+          loginAlert.style.display = 'block';
+        }
+      } catch (err) {
+        loginAlert.textContent = 'Gagal terhubung ke server.';
+        loginAlert.style.display = 'block';
+      }
+    });
+
+    btnQuickLogin.addEventListener('click', () => {
+      loginUser.value = 'admin';
+      loginPass.value = 'admin123';
+      formLogin.dispatchEvent(new Event('submit'));
+    });
+
+    btnLogout.addEventListener('click', async () => {
+      if (confirm('Apakah Anda yakin ingin keluar?')) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        localStorage.removeItem('lyric_auth_token');
+        authToken = null;
+        currentUser = null;
+        showLogin();
+      }
+    });
+
+    // -------------------------------------------------------------
+    // NAVIGATION TABS
+    // -------------------------------------------------------------
+    navTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        navTabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+
+        if (targetTab === 'tabSongs') renderSongsTable();
+        if (targetTab === 'tabPlaylists') renderPlaylistsView();
+      });
+    });
+
+    // -------------------------------------------------------------
+    // DATA FETCHING & SYNCHRONIZATION
+    // -------------------------------------------------------------
+    async function loadAllData() {
+      try {
+        const [songsRes, plRes, stateRes] = await Promise.all([
+          fetch('/api/songs'),
+          fetch('/api/playlists'),
+          fetch('/api/state')
+        ]);
+
+        songs = await songsRes.json();
+        playlists = await plRes.json();
+        state = await stateRes.json();
+
+        if (state.activePlaylistId) {
+          selectedPlaylistId = state.activePlaylistId;
+        }
+
+        populatePlaylistDropdown();
+        updateFilteredLiveSongs();
+        renderLyricsList();
+        renderSongsTable();
+        renderPlaylistsView();
+      } catch (err) {
+        console.error('Failed to load initial data:', err);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LIVE CONTROLLER LOGIC
+    // -------------------------------------------------------------
+    function populatePlaylistDropdown() {
+      ctrlPlaylistSelect.innerHTML = '';
+      
+      const allOpt = document.createElement('option');
+      allOpt.value = 'all';
+      allOpt.textContent = 'Semua Lagu (Library Lengkap)';
+      ctrlPlaylistSelect.appendChild(allOpt);
+
+      playlists.forEach(pl => {
+        if (pl.id === 'pl_all') return;
+        const opt = document.createElement('option');
+        opt.value = pl.id;
+        opt.textContent = `📋 ${pl.name} (${pl.songIds ? pl.songIds.length : 0} lagu)`;
+        ctrlPlaylistSelect.appendChild(opt);
+      });
+
+      ctrlPlaylistSelect.value = selectedPlaylistId;
+    }
+
+    function updateFilteredLiveSongs() {
+      if (selectedPlaylistId === 'all') {
+        filteredLiveSongs = [...songs];
+      } else {
+        const pl = playlists.find(p => p.id === selectedPlaylistId);
+        if (pl && pl.songIds) {
+          filteredLiveSongs = pl.songIds
+            .map(id => songs.find(s => s.id === id))
+            .filter(Boolean);
+        } else {
+          filteredLiveSongs = [...songs];
+        }
+      }
+
+      ctrlSongSelect.innerHTML = '';
+      filteredLiveSongs.forEach((song, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${idx + 1}. ${song.title}${song.artist ? ' - ' + song.artist : ''}`;
+        ctrlSongSelect.appendChild(opt);
+      });
+
+      if (state.currentSongIndex >= filteredLiveSongs.length) {
+        state.currentSongIndex = 0;
+      }
+      ctrlSongSelect.value = state.currentSongIndex;
+    }
+
+    ctrlPlaylistSelect.addEventListener('change', (e) => {
+      selectedPlaylistId = e.target.value;
+      updateFilteredLiveSongs();
+      setSong(0);
+      updateServerState({ activePlaylistId: selectedPlaylistId });
+    });
+
+    ctrlSongSelect.addEventListener('change', (e) => {
+      setSong(parseInt(e.target.value, 10));
+    });
+
+    function renderLyricsList() {
+      lyricsList.innerHTML = '';
+      if (!filteredLiveSongs || filteredLiveSongs.length === 0) return;
+      const curSong = filteredLiveSongs[state.currentSongIndex];
+      if (!curSong || !curSong.lines) return;
+
+      lineCounter.textContent = `Baris ${state.currentLineIndex + 1} / ${curSong.lines.length}`;
+
+      curSong.lines.forEach((lineText, idx) => {
+        const item = document.createElement('div');
+        item.className = 'lyric-item';
+        if (idx === state.currentLineIndex) {
+          item.classList.add('active');
+        }
+
+        item.innerHTML = `
+          <div class="line-num">${idx + 1}</div>
+          <div class="line-text">${lineText}</div>
+          <div class="live-badge">LIVE</div>
+        `;
+
+        item.addEventListener('click', () => {
+          setLine(idx);
+        });
+
+        lyricsList.appendChild(item);
+      });
+
+      scrollActiveIntoView();
+    }
+
+    function scrollActiveIntoView() {
+      const activeEl = lyricsList.querySelector('.lyric-item.active');
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    async function updateServerState(patch) {
+      Object.assign(state, patch);
+      applyLocalUI();
+
+      try {
+        await fetch('/api/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state)
+        });
+      } catch (err) {
+        console.error('Failed to sync state:', err);
+      }
+    }
+
+    function applyLocalUI() {
+      if (state.isBlank) {
+        btnBlank.classList.add('active-blank');
+        blankLabel.textContent = '🚫 DISPLAY BLANKED (KLIK TAMPILKAN)';
+      } else {
+        btnBlank.classList.remove('active-blank');
+        blankLabel.textContent = '👁 BLANK / HIDE TEKS';
+      }
+
+      const items = lyricsList.querySelectorAll('.lyric-item');
+      items.forEach((item, idx) => {
+        if (idx === state.currentLineIndex) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      const curSong = filteredLiveSongs[state.currentSongIndex];
+      if (curSong && curSong.lines) {
+        lineCounter.textContent = `Baris ${state.currentLineIndex + 1} / ${curSong.lines.length}`;
+      }
+
+      scrollActiveIntoView();
+    }
+
+    function nextLine() {
+      const curSong = filteredLiveSongs[state.currentSongIndex];
+      if (!curSong || !curSong.lines) return;
+      if (state.currentLineIndex < curSong.lines.length - 1) {
+        updateServerState({ currentLineIndex: state.currentLineIndex + 1, isBlank: false });
+      }
+    }
+
+    function prevLine() {
+      if (state.currentLineIndex > 0) {
+        updateServerState({ currentLineIndex: state.currentLineIndex - 1, isBlank: false });
+      }
+    }
+
+    function setLine(idx) {
+      updateServerState({ currentLineIndex: idx, isBlank: false });
+    }
+
+    function resetSong() {
+      updateServerState({ currentLineIndex: 0, isBlank: false });
+    }
+
+    function toggleBlank() {
+      updateServerState({ isBlank: !state.isBlank });
+    }
+
+    function setSong(index) {
+      if (index >= 0 && index < filteredLiveSongs.length) {
+        state.currentSongIndex = index;
+        const targetSong = filteredLiveSongs[index];
+        state.currentSongId = targetSong ? targetSong.id : null;
+        state.currentLineIndex = 0;
+        ctrlSongSelect.value = index;
+        renderLyricsList();
+        updateServerState({
+          currentSongIndex: index,
+          currentSongId: state.currentSongId,
+          currentLineIndex: 0,
+          isBlank: false
+        });
+      }
+    }
+
+    btnNext.addEventListener('click', nextLine);
+    btnPrev.addEventListener('click', prevLine);
+    btnReset.addEventListener('click', resetSong);
+    btnBlank.addEventListener('click', toggleBlank);
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (viewApp.style.display !== 'flex') return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+      if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'Enter') {
+        e.preventDefault();
+        nextLine();
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevLine();
+      } else if (e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleBlank();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        resetSong();
+      } else if (e.key === ']') {
+        e.preventDefault();
+        setSong(state.currentSongIndex + 1);
+      } else if (e.key === '[') {
+        e.preventDefault();
+        setSong(state.currentSongIndex - 1);
+      }
+    });
+
+    btnCopyUrl.addEventListener('click', () => {
+      const url = `${window.location.origin}/overlay`;
+      navigator.clipboard.writeText(url).then(() => {
+        const orig = btnCopyUrl.innerHTML;
+        btnCopyUrl.innerHTML = '✅ Copied!';
+        setTimeout(() => { btnCopyUrl.innerHTML = orig; }, 2000);
+      });
+    });
+
+    // -------------------------------------------------------------
+    // TAB 2: KELOLA LAGU (CRUD)
+    // -------------------------------------------------------------
+    const searchSong = document.getElementById('searchSong');
+    const songsTableBody = document.getElementById('songsTableBody');
+    const btnOpenNewSongModal = document.getElementById('btnOpenNewSongModal');
+    const modalSongForm = document.getElementById('modalSongForm');
+    const songModalTitle = document.getElementById('songModalTitle');
+    const editSongId = document.getElementById('editSongId');
+    const songFormTitle = document.getElementById('songFormTitle');
+    const songFormArtist = document.getElementById('songFormArtist');
+    const songFormLyrics = document.getElementById('songFormLyrics');
+    const btnCloseSongModal = document.getElementById('btnCloseSongModal');
+    const btnCancelSongModal = document.getElementById('btnCancelSongModal');
+    const btnSaveSongForm = document.getElementById('btnSaveSongForm');
+
+    function renderSongsTable() {
+      const query = (searchSong.value || '').toLowerCase();
+      songsTableBody.innerHTML = '';
+
+      const filtered = songs.filter(s =>
+        s.title.toLowerCase().includes(query) ||
+        (s.artist && s.artist.toLowerCase().includes(query)) ||
+        (s.lines && s.lines.some(l => l.toLowerCase().includes(query)))
+      );
+
+      if (filtered.length === 0) {
+        songsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada lagu yang cocok</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((song, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><div class="song-title-cell">🎵 ${song.title}</div></td>
+          <td>${song.artist || '-'}</td>
+          <td>${song.lines ? song.lines.length : 0} baris</td>
+          <td style="text-align:center;">
+            <div class="action-btn-group" style="justify-content:center;">
+              <button class="btn-tbl-action" onclick="openEditSongModal('${song.id}')">✏️ Edit</button>
+              <button class="btn-tbl-action danger" onclick="deleteSong('${song.id}')">🗑️ Hapus</button>
+            </div>
+          </td>
+        `;
+        songsTableBody.appendChild(tr);
+      });
+    }
+
+    searchSong.addEventListener('input', renderSongsTable);
+
+    btnOpenNewSongModal.addEventListener('click', () => {
+      songModalTitle.textContent = 'Tambah Lagu Baru';
+      editSongId.value = '';
+      songFormTitle.value = '';
+      songFormArtist.value = '';
+      songFormLyrics.value = '';
+      modalSongForm.style.display = 'flex';
+      songFormTitle.focus();
+    });
+
+    [btnCloseSongModal, btnCancelSongModal].forEach(b => {
+      b.addEventListener('click', () => { modalSongForm.style.display = 'none'; });
+    });
+
+    window.openEditSongModal = (id) => {
+      const song = songs.find(s => s.id === id);
+      if (!song) return;
+
+      songModalTitle.textContent = 'Edit Lagu';
+      editSongId.value = song.id;
+      songFormTitle.value = song.title;
+      songFormArtist.value = song.artist || '';
+      songFormLyrics.value = (song.lines || []).join('\n');
+      modalSongForm.style.display = 'flex';
+    };
+
+    btnSaveSongForm.addEventListener('click', async () => {
+      const id = editSongId.value;
+      const title = songFormTitle.value.trim();
+      const artist = songFormArtist.value.trim();
+      const rawLyrics = songFormLyrics.value.trim();
+
+      if (!title || !rawLyrics) {
+        alert('Judul dan lirik lagu wajib diisi!');
+        return;
+      }
+
+      const lines = rawLyrics.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const payload = { title, artist, lines };
+
+      try {
+        if (id) {
+          // Update
+          await fetch(`/api/songs/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          // Create
+          await fetch('/api/songs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        modalSongForm.style.display = 'none';
+        await loadAllData();
+      } catch (err) {
+        alert('Gagal menyimpan lagu: ' + err.message);
+      }
+    });
+
+    window.deleteSong = async (id) => {
+      const song = songs.find(s => s.id === id);
+      if (!song) return;
+      if (!confirm(`Hapus lagu "${song.title}"?`)) return;
+
+      try {
+        await fetch(`/api/songs/${id}`, { method: 'DELETE' });
+        await loadAllData();
+      } catch (err) {
+        alert('Gagal menghapus lagu: ' + err.message);
+      }
+    };
+
+    // -------------------------------------------------------------
+    // TAB 3: KELOLA PLAYLIST (SETLIST)
+    // -------------------------------------------------------------
+    const playlistsContainer = document.getElementById('playlistsContainer');
+    const curPlaylistTitle = document.getElementById('curPlaylistTitle');
+    const curPlaylistDesc = document.getElementById('curPlaylistDesc');
+    const curPlaylistSongsContainer = document.getElementById('curPlaylistSongsContainer');
+    const btnOpenNewPlaylistModal = document.getElementById('btnOpenNewPlaylistModal');
+    const btnAddSongToPlaylistModal = document.getElementById('btnAddSongToPlaylistModal');
+    const btnSetActiveForLive = document.getElementById('btnSetActiveForLive');
+    const btnDeleteCurrentPlaylist = document.getElementById('btnDeleteCurrentPlaylist');
+
+    let currentEditingPlaylistId = 'pl_1';
+
+    function renderPlaylistsView() {
+      playlistsContainer.innerHTML = '';
+      
+      playlists.forEach(pl => {
+        const item = document.createElement('div');
+        item.className = 'playlist-card-item' + (pl.id === currentEditingPlaylistId ? ' active' : '');
+        item.innerHTML = `
+          <div class="pl-name">📋 ${pl.name}</div>
+          <div class="pl-info">${pl.songIds ? pl.songIds.length : 0} lagu ${pl.id === selectedPlaylistId ? '• <span style="color:#00d2ff; font-weight:700;">Live Active</span>' : ''}</div>
+        `;
+        item.addEventListener('click', () => {
+          currentEditingPlaylistId = pl.id;
+          renderPlaylistsView();
+        });
+        playlistsContainer.appendChild(item);
+      });
+
+      renderCurrentPlaylistDetail();
+    }
+
+    function renderCurrentPlaylistDetail() {
+      const pl = playlists.find(p => p.id === currentEditingPlaylistId);
+      if (!pl) return;
+
+      curPlaylistTitle.textContent = pl.name;
+      curPlaylistDesc.textContent = pl.description || 'Tidak ada deskripsi';
+      curPlaylistSongsContainer.innerHTML = '';
+
+      if (!pl.songIds || pl.songIds.length === 0) {
+        curPlaylistSongsContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">Belum ada lagu dalam playlist ini. Klik "+ Tambah Lagu ke Sini" di atas.</div>`;
+        return;
+      }
+
+      pl.songIds.forEach((sid, idx) => {
+        const song = songs.find(s => s.id === sid);
+        if (!song) return;
+
+        const row = document.createElement('div');
+        row.className = 'pl-song-row';
+        row.innerHTML = `
+          <div class="pl-song-info">
+            <span class="pl-song-num">${idx + 1}</span>
+            <div>
+              <div style="font-weight:700; color:#fff;">${song.title}</div>
+              <div style="font-size:12px; color:var(--text-muted);">${song.artist || ''} • ${song.lines ? song.lines.length : 0} baris</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="btn-icon-move" onclick="moveSongInPlaylist(${idx}, -1)" title="Pindah ke atas" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button class="btn-icon-move" onclick="moveSongInPlaylist(${idx}, 1)" title="Pindah ke bawah" ${idx === pl.songIds.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+            <button class="btn-tbl-action danger" onclick="removeSongFromPlaylist('${sid}')" title="Keluarkan dari playlist">Hapus</button>
+          </div>
+        `;
+        curPlaylistSongsContainer.appendChild(row);
+      });
+    }
+
+    window.moveSongInPlaylist = async (idx, direction) => {
+      const pl = playlists.find(p => p.id === currentEditingPlaylistId);
+      if (!pl) return;
+
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= pl.songIds.length) return;
+
+      const temp = pl.songIds[idx];
+      pl.songIds[idx] = pl.songIds[targetIdx];
+      pl.songIds[targetIdx] = temp;
+
+      await fetch(`/api/playlists/${pl.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ songIds: pl.songIds })
+      });
+
+      renderCurrentPlaylistDetail();
+      if (selectedPlaylistId === pl.id) {
+        updateFilteredLiveSongs();
+        renderLyricsList();
+      }
+    };
+
+    window.removeSongFromPlaylist = async (sid) => {
+      const pl = playlists.find(p => p.id === currentEditingPlaylistId);
+      if (!pl) return;
+
+      pl.songIds = pl.songIds.filter(id => id !== sid);
+      await fetch(`/api/playlists/${pl.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ songIds: pl.songIds })
+      });
+
+      renderPlaylistsView();
+      if (selectedPlaylistId === pl.id) {
+        updateFilteredLiveSongs();
+        renderLyricsList();
+      }
+    };
+
+    btnSetActiveForLive.addEventListener('click', () => {
+      selectedPlaylistId = currentEditingPlaylistId;
+      ctrlPlaylistSelect.value = selectedPlaylistId;
+      updateFilteredLiveSongs();
+      setSong(0);
+      updateServerState({ activePlaylistId: selectedPlaylistId });
+      alert(`Playlist "${curPlaylistTitle.textContent}" berhasil dipasang di Live Show!`);
+      renderPlaylistsView();
+    });
+
+    btnDeleteCurrentPlaylist.addEventListener('click', async () => {
+      if (playlists.length <= 1) {
+        alert('Minimal harus ada 1 playlist di sistem!');
+        return;
+      }
+      if (!confirm(`Hapus playlist "${curPlaylistTitle.textContent}"?`)) return;
+
+      await fetch(`/api/playlists/${currentEditingPlaylistId}`, { method: 'DELETE' });
+      await loadAllData();
+      currentEditingPlaylistId = playlists[0] ? playlists[0].id : 'all';
+      renderPlaylistsView();
+    });
+
+    // MODAL CREATE PLAYLIST
+    const modalPlaylistForm = document.getElementById('modalPlaylistForm');
+    const plModalTitle = document.getElementById('plModalTitle');
+    const editPlaylistId = document.getElementById('editPlaylistId');
+    const plFormName = document.getElementById('plFormName');
+    const plFormDesc = document.getElementById('plFormDesc');
+    const btnClosePlaylistModal = document.getElementById('btnClosePlaylistModal');
+    const btnCancelPlaylistModal = document.getElementById('btnCancelPlaylistModal');
+    const btnSavePlaylistForm = document.getElementById('btnSavePlaylistForm');
+    const btnEditPlaylistInfo = document.getElementById('btnEditPlaylistInfo');
+
+    btnOpenNewPlaylistModal.addEventListener('click', () => {
+      plModalTitle.textContent = 'Buat Playlist Baru';
+      editPlaylistId.value = '';
+      plFormName.value = '';
+      plFormDesc.value = '';
+      modalPlaylistForm.style.display = 'flex';
+      plFormName.focus();
+    });
+
+    btnEditPlaylistInfo.addEventListener('click', () => {
+      const pl = playlists.find(p => p.id === currentEditingPlaylistId);
+      if (!pl) return;
+      plModalTitle.textContent = 'Edit Info Playlist';
+      editPlaylistId.value = pl.id;
+      plFormName.value = pl.name;
+      plFormDesc.value = pl.description || '';
+      modalPlaylistForm.style.display = 'flex';
+      plFormName.focus();
+    });
+
+    [btnClosePlaylistModal, btnCancelPlaylistModal].forEach(b => {
+      b.addEventListener('click', () => { modalPlaylistForm.style.display = 'none'; });
+    });
+
+    btnSavePlaylistForm.addEventListener('click', async () => {
+      const name = plFormName.value.trim();
+      const description = plFormDesc.value.trim();
+      const id = editPlaylistId.value;
+
+      if (!name) {
+        alert('Nama playlist wajib diisi!');
+        return;
+      }
+
+      try {
+        if (id) {
+          // Update existing playlist
+          await fetch(`/api/playlists/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description })
+          });
+        } else {
+          // Create new playlist
+          const res = await fetch('/api/playlists', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description, songIds: [] })
+          });
+          const data = await res.json();
+          currentEditingPlaylistId = data.playlist.id;
+        }
+
+        modalPlaylistForm.style.display = 'none';
+        await loadAllData();
+        renderPlaylistsView();
+      } catch (err) {
+        alert('Gagal menyimpan playlist: ' + err.message);
+      }
+    });
+
+    // MODAL ADD SONGS TO PLAYLIST
+    const modalAddSongToPl = document.getElementById('modalAddSongToPl');
+    const songsToSelectContainer = document.getElementById('songsToSelectContainer');
+    const btnCloseAddSongToPl = document.getElementById('btnCloseAddSongToPl');
+    const btnCancelAddSongToPl = document.getElementById('btnCancelAddSongToPl');
+    const btnConfirmAddSongToPl = document.getElementById('btnConfirmAddSongToPl');
+
+    btnAddSongToPlaylistModal.addEventListener('click', () => {
+      const pl = playlists.find(p => p.id === currentEditingPlaylistId);
+      if (!pl) return;
+
+      songsToSelectContainer.innerHTML = '';
+      const existing = new Set(pl.songIds || []);
+
+      songs.forEach(song => {
+        const isChecked = existing.has(song.id);
+        const label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '10px';
+        label.style.padding = '8px 12px';
+        label.style.background = '#111622';
+        label.style.borderRadius = '6px';
+        label.style.cursor = 'pointer';
+
+        label.innerHTML = `
+          <input type="checkbox" value="${song.id}" ${isChecked ? 'checked' : ''}>
+          <div>
+            <div style="font-weight:700; color:#fff;">${song.title}</div>
+            <div style="font-size:11px; color:var(--text-muted);">${song.artist || ''}</div>
+          </div>
+        `;
+        songsToSelectContainer.appendChild(label);
+      });
+
+      modalAddSongToPl.style.display = 'flex';
+    });
+
+    [btnCloseAddSongToPl, btnCancelAddSongToPl].forEach(b => {
+      b.addEventListener('click', () => { modalAddSongToPl.style.display = 'none'; });
+    });
+
+    btnConfirmAddSongToPl.addEventListener('click', async () => {
+      const pl = playlists.find(p => p.id === currentEditingPlaylistId);
+      if (!pl) return;
+
+      const checkedIds = Array.from(songsToSelectContainer.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+
+      pl.songIds = checkedIds;
+      await fetch(`/api/playlists/${pl.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ songIds: checkedIds })
+      });
+
+      modalAddSongToPl.style.display = 'none';
+      renderPlaylistsView();
+      if (selectedPlaylistId === pl.id) {
+        updateFilteredLiveSongs();
+        renderLyricsList();
+      }
+    });
+
+    // -------------------------------------------------------------
+    // SETTINGS MODAL LOGIC
+    // -------------------------------------------------------------
+    const modalSettings = document.getElementById('modalSettings');
+    const btnOpenSettings = document.getElementById('btnOpenSettings');
+    const btnCloseSettings = document.getElementById('btnCloseSettings');
+    const btnApplySettings = document.getElementById('btnApplySettings');
+    const btnResetSettings = document.getElementById('btnResetSettings');
+
+    const settingFontFamily = document.getElementById('settingFontFamily');
+    const settingFontSize = document.getElementById('settingFontSize');
+    const lblFontSize = document.getElementById('lblFontSize');
+    const settingOpacity = document.getElementById('settingOpacity');
+    const lblOpacity = document.getElementById('lblOpacity');
+    const settingActiveColor = document.getElementById('settingActiveColor');
+    const settingStrokeColor = document.getElementById('settingStrokeColor');
+    const settingStrokeWidth = document.getElementById('settingStrokeWidth');
+    const lblStrokeWidth = document.getElementById('lblStrokeWidth');
+    const settingGlowEnabled = document.getElementById('settingGlowEnabled');
+    const settingGlowColor = document.getElementById('settingGlowColor');
+
+    function openSettingsModal() {
+      const s = state.settings || {};
+      settingFontFamily.value = s.fontFamily || 'Montserrat';
+      settingFontSize.value = s.activeFontSize || 46;
+      lblFontSize.textContent = `${settingFontSize.value}px`;
+      settingOpacity.value = typeof s.inactiveOpacity === 'number' ? s.inactiveOpacity : 35;
+      lblOpacity.textContent = `${settingOpacity.value}%`;
+      settingActiveColor.value = s.activeColor || '#FFFFFF';
+      settingStrokeColor.value = s.strokeColor || '#000000';
+      settingStrokeWidth.value = s.strokeWidth || 2.2;
+      lblStrokeWidth.textContent = `${settingStrokeWidth.value}px`;
+      settingGlowEnabled.checked = s.glowEnabled !== false;
+      settingGlowColor.value = s.glowColor || '#00d2ff';
+      modalSettings.style.display = 'flex';
+    }
+
+    btnOpenSettings.addEventListener('click', openSettingsModal);
+    btnCloseSettings.addEventListener('click', () => { modalSettings.style.display = 'none'; });
+
+    settingFontSize.addEventListener('input', () => { lblFontSize.textContent = `${settingFontSize.value}px`; });
+    settingOpacity.addEventListener('input', () => { lblOpacity.textContent = `${settingOpacity.value}%`; });
+    settingStrokeWidth.addEventListener('input', () => { lblStrokeWidth.textContent = `${settingStrokeWidth.value}px`; });
+
+    document.querySelectorAll('.swatch-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        settingActiveColor.value = e.target.getAttribute('data-color');
+      });
+    });
+
+    btnApplySettings.addEventListener('click', async () => {
+      const newSettings = {
+        fontFamily: settingFontFamily.value,
+        activeFontSize: parseInt(settingFontSize.value, 10),
+        inactiveOpacity: parseInt(settingOpacity.value, 10),
+        activeColor: settingActiveColor.value,
+        strokeColor: settingStrokeColor.value,
+        strokeWidth: parseFloat(settingStrokeWidth.value),
+        glowEnabled: settingGlowEnabled.checked,
+        glowColor: settingGlowColor.value,
+        verticalPosition: 50
+      };
+
+      state.settings = newSettings;
+      await updateServerState({ settings: newSettings });
+
+      const iframe = document.getElementById('previewIframe');
+      iframe.src = iframe.src;
+      modalSettings.style.display = 'none';
+    });
+
+    btnResetSettings.addEventListener('click', () => {
+      settingFontFamily.value = 'Montserrat';
+      settingFontSize.value = 46;
+      settingOpacity.value = 35;
+      settingActiveColor.value = '#FFFFFF';
+      settingStrokeColor.value = '#000000';
+      settingStrokeWidth.value = 2.2;
+      settingGlowEnabled.checked = true;
+      settingGlowColor.value = '#00d2ff';
+      lblFontSize.textContent = '46px';
+      lblOpacity.textContent = '35%';
+      lblStrokeWidth.textContent = '2.2px';
+    });
+
+    // -------------------------------------------------------------
+    // SSE REALTIME SYNC
+    // -------------------------------------------------------------
+    function connectSSE() {
+      const evtSource = new EventSource('/events');
+      evtSource.onmessage = (e) => {
+        try {
+          const newState = JSON.parse(e.data);
+          const songChanged = newState.currentSongIndex !== state.currentSongIndex;
+          state = newState;
+          if (songChanged) {
+            ctrlSongSelect.value = state.currentSongIndex;
+            renderLyricsList();
+          } else {
+            applyLocalUI();
+          }
+        } catch (err) {}
+      };
+      evtSource.onerror = () => {
+        evtSource.close();
+        setTimeout(connectSSE, 2000);
+      };
+    }
+
+    // BOOTSTRAP
+    checkAuth();
+    connectSSE();
+  </script>
+</body>
+</html>

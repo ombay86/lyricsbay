@@ -1,0 +1,7 @@
+node_modules
+*.vmix
+*.docx
+*.py
+lyrics_extracted.txt
+init_db.js
+.git

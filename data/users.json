@@ -1,0 +1,20 @@
+[
+  {
+    "id": "usr_1",
+    "username": "admin",
+    "name": "Administrator",
+    "role": "admin",
+    "salt": "027b2200bdd6e99d1cbcc35d6dcc3506",
+    "hash": "b29c27ec9aed5308057e577567d7c19a5bc50760f6581a62aa171e7b26c9b109738cd4d056f0849a5428647410e3f0829e6b1e4486dcdccb9afef30cedf9f123",
+    "createdAt": "2026-09-25T07:01:22.509Z"
+  },
+  {
+    "id": "usr_2",
+    "username": "operator",
+    "name": "Show Operator",
+    "role": "operator",
+    "salt": "3dba824e9809d3339ec39dd398c13d35",
+    "hash": "fde044ab4b9c787f03f533546a0a6e9636559e1c2255985c4ca26b288b56ad2e07050feadce481733b08a18e2a78ee4af242eef2c8276d7c9f6bf9b3b15719be",
+    "createdAt": "2026-09-25T07:01:22.509Z"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "name": "lyricsbay",
+  "version": "1.0.0",
+  "description": "LyricsBay - Automated Live Lyric Visual Prompter & Overlay for vMix",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["lyrics", "vmix", "prompter", "live-production"],
+  "author": "OMBAY",
+  "license": "ISC"
+}
