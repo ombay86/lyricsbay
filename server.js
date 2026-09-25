@@ -170,24 +170,71 @@ const server = http.createServer(async (req, res) => {
       const users = readJSON(USERS_FILE, []);
       const user = users.find(u => u.username.toLowerCase() === (username || '').toLowerCase());
 
-      if (!user || !verifyPassword(password, user.salt, user.hash)) {
-        return sendJSON(res, 401, { error: 'Username atau password salah!' });
+      // 1. Check local users
+      if (user && verifyPassword(password, user.salt, user.hash)) {
+        const token = crypto.randomBytes(32).toString('hex');
+        const sessionUser = {
+          id: user.id,
+          username: user.username,
+          name: user.name,
+          role: user.role
+        };
+        activeSessions.set(token, sessionUser);
+        return sendJSON(res, 200, {
+          success: true,
+          token,
+          user: sessionUser
+        });
       }
 
-      const token = crypto.randomBytes(32).toString('hex');
-      const sessionUser = {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        role: user.role
-      };
-      activeSessions.set(token, sessionUser);
+      // 2. Fallback: Authenticate against Jurnal Ombay Central Database
+      try {
+        const ssoHubUrl = process.env.SSO_HUB_URL || 'https://jurnalombay.my.id';
+        const loginUrl = new URL('/sso/login', ssoHubUrl);
+        const postData = JSON.stringify({ identifier: username, password });
+        const client = loginUrl.protocol === 'https:' ? require('node:https') : require('node:http');
 
-      return sendJSON(res, 200, {
-        success: true,
-        token,
-        user: sessionUser
-      });
+        const ssoReq = client.request(loginUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+          }
+        }, (ssoRes) => {
+          let body = '';
+          ssoRes.on('data', chunk => body += chunk);
+          ssoRes.on('end', () => {
+            try {
+              const result = JSON.parse(body);
+              if (result.success && result.user) {
+                const token = crypto.randomBytes(32).toString('hex');
+                const sessionUser = {
+                  id: result.user.id,
+                  username: result.user.username,
+                  name: result.user.fullName || result.user.username,
+                  role: result.user.role
+                };
+                activeSessions.set(token, sessionUser);
+                return sendJSON(res, 200, { success: true, token, user: sessionUser });
+              } else {
+                return sendJSON(res, 401, { error: result.error || 'Username atau password salah!' });
+              }
+            } catch (e) {
+              return sendJSON(res, 401, { error: 'Username atau password salah!' });
+            }
+          });
+        });
+
+        ssoReq.on('error', () => {
+          return sendJSON(res, 401, { error: 'Username atau password salah!' });
+        });
+
+        ssoReq.write(postData);
+        ssoReq.end();
+        return;
+      } catch (ssoErr) {
+        return sendJSON(res, 401, { error: 'Username atau password salah!' });
+      }
     } catch (err) {
       return sendJSON(res, 400, { error: err.message });
     }
