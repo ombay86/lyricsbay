@@ -173,17 +173,17 @@
     header {
       background: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 8px 24px;
+      padding: 10px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      position: relative;
+      z-index: 100;
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
+    .header-main-bar {
+      display: contents;
     }
 
     .app-logo {
@@ -194,6 +194,7 @@
       -webkit-text-fill-color: transparent;
       letter-spacing: -0.5px;
       white-space: nowrap;
+      order: 1;
     }
 
     /* NAV TABS */
@@ -204,6 +205,14 @@
       padding: 4px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
+      order: 2;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      order: 3;
     }
 
     .nav-tab-btn {
@@ -229,12 +238,6 @@
       background: #1e2638;
       color: var(--primary);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .user-pill {
@@ -926,6 +929,288 @@
       background: var(--primary);
       cursor: pointer;
     }
+
+    /* ============================================================ */
+    /* RESPONSIVE MOBILE STYLES (Screen width <= 900px)             */
+    /* ============================================================ */
+    @media (max-width: 900px) {
+      body, #viewApp {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+      }
+
+      /* 1. HEADER RESPONSIVE */
+      header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 8px 12px !important;
+        gap: 8px !important;
+      }
+
+      .header-main-bar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        order: 1 !important;
+      }
+
+      .app-logo {
+        font-size: 17px !important;
+        order: 1 !important;
+      }
+
+      .header-right {
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        order: 2 !important;
+      }
+
+      .hide-mobile {
+        display: none !important;
+      }
+
+      .btn-header {
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+        gap: 3px !important;
+        border-radius: 6px !important;
+      }
+
+      .user-pill {
+        padding: 4px 7px !important;
+        font-size: 11px !important;
+        gap: 4px !important;
+      }
+
+      .btn-logout {
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+      }
+
+      .nav-tabs {
+        display: flex !important;
+        width: 100% !important;
+        gap: 4px !important;
+        padding: 3px !important;
+        order: 2 !important;
+      }
+
+      .nav-tab-btn {
+        flex: 1 !important;
+        padding: 8px 4px !important;
+        font-size: 11px !important;
+        justify-content: center !important;
+        text-align: center !important;
+        gap: 4px !important;
+        white-space: nowrap !important;
+      }
+
+      /* 2. TAB 1: LIVE CONTROLLER RESPONSIVE */
+      .controller-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 8px 10px 14px 10px !important;
+        gap: 12px !important;
+        overflow: visible !important;
+        height: auto !important;
+        flex: 1 !important;
+      }
+
+      /* Song & Playlist Selector Bar */
+      .left-panel {
+        flex: none !important;
+        width: 100% !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .playlist-filter-bar {
+        padding: 8px 12px !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+
+      .playlist-select {
+        flex: 1 !important;
+        min-width: 150px !important;
+        font-size: 13px !important;
+      }
+
+      .song-select-bar {
+        padding: 8px 12px !important;
+      }
+
+      .song-dropdown {
+        font-size: 14px !important;
+        padding: 8px 10px !important;
+      }
+
+      .lyrics-list-container {
+        height: 300px !important;
+        max-height: 40vh !important;
+        padding: 6px 8px !important;
+      }
+
+      .lyric-item {
+        padding: 9px 10px !important;
+        gap: 8px !important;
+        border-radius: 8px !important;
+      }
+      .lyric-item .line-num {
+        min-width: 20px !important;
+        font-size: 11px !important;
+      }
+      .lyric-item .line-text {
+        font-size: 14px !important;
+        line-height: 1.35 !important;
+      }
+      .lyric-item.active .line-text {
+        font-size: 15px !important;
+      }
+
+      /* Live Action Controls */
+      .right-panel {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+
+      .control-card {
+        padding: 12px !important;
+        gap: 8px !important;
+        background: #111622 !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+      }
+
+      .card-title {
+        font-size: 11px !important;
+      }
+
+      .btn-trigger-main {
+        padding: 14px 16px !important;
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        border-radius: 10px !important;
+        letter-spacing: 0.5px !important;
+      }
+      .btn-trigger-main .key-hint {
+        display: none !important;
+      }
+
+      .secondary-controls {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+      .btn-ctrl {
+        padding: 11px 8px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
+      }
+      .btn-ctrl .key-hint {
+        display: none !important;
+      }
+
+      .btn-blank {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
+      }
+      .btn-blank kbd {
+        display: none !important;
+      }
+
+      .preview-box {
+        border-radius: 10px !important;
+        overflow: hidden !important;
+      }
+      .preview-iframe {
+        height: 170px !important;
+      }
+
+      .shortcut-legend {
+        display: none !important;
+      }
+
+      /* 3. TAB 2: KELOLA LAGU RESPONSIVE */
+      .library-layout {
+        padding: 12px 10px !important;
+        gap: 12px !important;
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+      .library-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+      }
+      .search-input {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      .btn-primary {
+        width: 100% !important;
+        justify-content: center !important;
+      }
+      .songs-table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      table.data-table th, table.data-table td {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+      }
+
+      /* 4. TAB 3: KELOLA PLAYLIST RESPONSIVE */
+      .playlist-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 12px 10px !important;
+        gap: 14px !important;
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+      .playlist-sidebar {
+        max-height: 240px !important;
+      }
+      .playlist-detail-panel {
+        min-height: 350px !important;
+      }
+      .playlist-detail-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+      }
+
+      /* 5. MODAL POPUPS RESPONSIVE */
+      .modal-overlay {
+        padding: 10px !important;
+      }
+      .modal-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 16px !important;
+        max-height: 94vh !important;
+        overflow-y: auto !important;
+      }
+      .setting-row {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -974,35 +1259,35 @@
   <div id="viewApp">
     <!-- APP HEADER -->
     <header>
-      <div class="header-left">
+      <div class="header-main-bar">
         <div class="app-logo">🎤 LyricsBay</div>
-        
-        <!-- MAIN TABS -->
-        <nav class="nav-tabs">
-          <button class="nav-tab-btn active" data-tab="tabController">🎮 Live Controller</button>
-          <button class="nav-tab-btn" data-tab="tabSongs">🎵 Kelola Lagu</button>
-          <button class="nav-tab-btn" data-tab="tabPlaylists">📋 Kelola Playlist</button>
-        </nav>
-      </div>
 
-      <div class="header-right">
-        <button class="btn-header" id="btnOpenSettings" title="Atur Font, Warna & Ukuran Overlay">
-          🎨 Setting Visual
-        </button>
+        <div class="header-right">
+          <button class="btn-header" id="btnOpenSettings" title="Atur Font, Warna & Ukuran Overlay">
+            🎨 <span class="hide-mobile">Setting</span>
+          </button>
 
-        <button class="btn-header" id="btnCopyUrl" title="Salin URL untuk di-paste ke Add Input > Web Browser di vMix">
-          📋 Copy vMix URL
-        </button>
+          <button class="btn-header" id="btnCopyUrl" title="Salin URL untuk di-paste ke Add Input > Web Browser di vMix">
+            📋 <span class="hide-mobile">Copy vMix URL</span>
+          </button>
 
-        <div class="user-pill">
-          <span style="color: #10b981;">●</span>
-          <span id="userNameDisplay">Admin</span>
+          <div class="user-pill">
+            <span style="color: #10b981;">●</span>
+            <span id="userNameDisplay">Admin</span>
+          </div>
+
+          <button class="btn-header btn-logout" id="btnLogout" title="Keluar dari sesi">
+            Keluar
+          </button>
         </div>
-
-        <button class="btn-header btn-logout" id="btnLogout" title="Keluar dari sesi">
-          Keluar
-        </button>
       </div>
+
+      <!-- MAIN TABS -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="tabController">🎮 Live Controller</button>
+        <button class="nav-tab-btn" data-tab="tabSongs">🎵 Kelola Lagu</button>
+        <button class="nav-tab-btn" data-tab="tabPlaylists">📋 Kelola Playlist</button>
+      </nav>
     </header>
 
     <!-- ------------------------------------------------------- -->
