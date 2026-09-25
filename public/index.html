@@ -965,10 +965,6 @@
       <a href="https://jurnalombay.my.id/sso/authorize?app=lyricsbay" id="btnSSOLogin" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; background:#0f172a; color:#38bdf8; border:1px solid #0284c7; border-radius:8px; font-weight:700; font-size:13px; text-decoration:none; transition:all 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);">
         🌐 Masuk dengan Akun Jurnal Ombay (SSO)
       </a>
-
-      <div class="login-hint" id="btnQuickLogin">
-        💡 <b>Klik di sini</b> untuk otomatis login cepat lokal sebagai <b>admin</b>
-      </div>
     </div>
   </div>
 
@@ -1364,7 +1360,6 @@
     const loginUser = document.getElementById('loginUser');
     const loginPass = document.getElementById('loginPass');
     const loginAlert = document.getElementById('loginAlert');
-    const btnQuickLogin = document.getElementById('btnQuickLogin');
     const userNameDisplay = document.getElementById('userNameDisplay');
     const btnLogout = document.getElementById('btnLogout');
 
@@ -1473,12 +1468,6 @@
         loginAlert.textContent = 'Gagal terhubung ke server.';
         loginAlert.style.display = 'block';
       }
-    });
-
-    btnQuickLogin.addEventListener('click', () => {
-      loginUser.value = 'admin';
-      loginPass.value = 'admin123';
-      formLogin.dispatchEvent(new Event('submit'));
     });
 
     btnLogout.addEventListener('click', async () => {
