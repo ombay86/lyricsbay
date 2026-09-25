@@ -42,7 +42,9 @@
       "Life has a funny way of sneaking up on you",
       "Life has a funny, funny way of helping you out",
       "Helping you out"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_2",
@@ -93,7 +95,9 @@
       "I'm leaving on a jet plane",
       "Don't know when I'll be back again",
       "Oh babe, I hate to go"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_3",
@@ -142,7 +146,9 @@
       "I've been numb, I'm revived",
       "Can't say I'm not alive",
       "You know I wouldn't want it any other way"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_4",
@@ -179,7 +185,9 @@
       "Zombie, zombie, zombie?",
       "Hey, hey, hey, hey, oh, oh, oh,",
       "Oh, oh, oh, oh, hey, oh, ya, ya-a..."
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_5",
@@ -221,7 +229,9 @@
       "Maling kelas teri, bandit kelas coro, itu kantong sampah",
       "Siapa yang mau berguru, datang padaku, sebut 3 kali namaku",
       "Bento bento bento.. asik.."
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_6",
@@ -276,7 +286,9 @@
       "I'd steal the sun from the sky for you",
       "Words can't say what love can do",
       "I'll be there for you …"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_7",
@@ -335,7 +347,9 @@
       "For tonite I sleep on a bed on nails",
       "I want to be just as close as the Holy Ghost is",
       "And lay you down on bed of roses"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_8",
@@ -387,7 +401,9 @@
       "Have to say",
       "That you love me",
       "'Cause I'd already know"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_9",
@@ -449,7 +465,9 @@
       "Yes, I need more time",
       "Just to make things right",
       "So don't go away"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   },
   {
     "id": "song_10",
@@ -520,6 +538,8 @@
       "When I see you smile",
       "Oh yeah",
       "Baby when I see you smile"
-    ]
+    ],
+    "userId": "usr_gms",
+    "username": "gms"
   }
 ]

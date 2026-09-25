@@ -29,10 +29,6 @@ function readJSON(file, fallback = []) {
 function writeJSON(file, data) {
   try {
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-    // Also sync songs and settings to public if relevant
-    if (file === SONGS_FILE) {
-      fs.writeFileSync(path.join(PUBLIC_DIR, 'songs.json'), JSON.stringify(data, null, 2), 'utf-8');
-    }
     if (file === SETTINGS_FILE) {
       fs.writeFileSync(path.join(PUBLIC_DIR, 'settings.json'), JSON.stringify(data, null, 2), 'utf-8');
     }
@@ -50,6 +46,24 @@ function verifyPassword(password, salt, hash) {
 // Active Sessions Store: token -> user
 const activeSessions = new Map();
 
+// Helper: Multi-tenant ownership check
+// Legacy or untagged items default to 'gms'
+// 'gms' and 'gmsco' are treated as aliases for the GMS tenant
+function canAccess(item, user) {
+  if (!user || !user.username) return false;
+  const currentUsername = (user.username || '').toLowerCase().trim();
+  const itemOwner = (item.username || item.userId || 'gms').toLowerCase().trim();
+
+  if (itemOwner === currentUsername) return true;
+
+  // GMS tenant alias
+  const isGmsUser = currentUsername === 'gms' || currentUsername === 'gmsco';
+  const isGmsItem = itemOwner === 'gms' || itemOwner === 'gmsco';
+  if (isGmsUser && isGmsItem) return true;
+
+  return false;
+}
+
 // Default Visual Settings
 const defaultSettings = {
   fontFamily: 'Montserrat',
@@ -63,13 +77,18 @@ const defaultSettings = {
   verticalPosition: 50
 };
 
+// Initial state song
+const initialSongs = readJSON(SONGS_FILE, []);
+const initialSong = initialSongs.find(s => s.id === 'song_1') || initialSongs[0] || null;
+
 // Global Application Live State
 let appState = {
   currentSongIndex: 0,
-  currentSongId: 'song_1',
+  currentSongId: initialSong ? initialSong.id : 'song_1',
   currentLineIndex: 0,
   isBlank: false,
   activePlaylistId: 'pl_1',
+  currentSong: initialSong,
   settings: { ...defaultSettings, ...readJSON(SETTINGS_FILE, defaultSettings) },
   timestamp: Date.now()
 };
@@ -321,12 +340,24 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/state' && req.method === 'POST') {
     try {
+      const user = getSessionUser(req);
       const data = await parseBody(req);
       if (typeof data.currentSongIndex === 'number') appState.currentSongIndex = data.currentSongIndex;
-      if (typeof data.currentSongId === 'string') appState.currentSongId = data.currentSongId;
+      if (typeof data.currentSongId === 'string') {
+        appState.currentSongId = data.currentSongId;
+        const songs = readJSON(SONGS_FILE, []);
+        const target = songs.find(s => s.id === data.currentSongId);
+        if (target) appState.currentSong = target;
+      }
+      if (data.currentSong && data.currentSong.lines) {
+        appState.currentSong = data.currentSong;
+      }
       if (typeof data.currentLineIndex === 'number') appState.currentLineIndex = data.currentLineIndex;
       if (typeof data.isBlank === 'boolean') appState.isBlank = data.isBlank;
       if (typeof data.activePlaylistId === 'string') appState.activePlaylistId = data.activePlaylistId;
+      if (user) {
+        appState.activeUser = user.username;
+      }
       if (data.settings) {
         appState.settings = { ...appState.settings, ...data.settings };
         writeJSON(SETTINGS_FILE, appState.settings);
@@ -361,23 +392,49 @@ const server = http.createServer(async (req, res) => {
   }
 
   // -------------------------------------------------------------
-  // SONGS CRUD APIS
+  // SONGS CRUD APIS (USER-SCOPED)
   // -------------------------------------------------------------
   if (pathname === '/api/songs' && req.method === 'GET') {
+    const user = getSessionUser(req);
     const songs = readJSON(SONGS_FILE, []);
-    return sendJSON(res, 200, songs);
+
+    if (user) {
+      // Authenticated: return strictly songs belonging to this user
+      const userSongs = songs.filter(s => canAccess(s, user));
+      return sendJSON(res, 200, userSongs);
+    } else {
+      // Unauthenticated (vMix overlay or public preview):
+      // Return ONLY the currently live song so overlay functions without exposing libraries
+      if (appState.currentSong) {
+        return sendJSON(res, 200, [appState.currentSong]);
+      }
+      const activeSong = songs.find(s => s.id === appState.currentSongId);
+      return sendJSON(res, 200, activeSong ? [activeSong] : []);
+    }
   }
 
   if (pathname === '/api/songs' && req.method === 'POST') {
     try {
+      const user = getSessionUser(req);
+      if (!user) {
+        return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+      }
+
       const songData = await parseBody(req);
       const songs = readJSON(SONGS_FILE, []);
 
       // If payload is an array (batch save/reorder)
       if (Array.isArray(songData)) {
-        writeJSON(SONGS_FILE, songData);
+        const otherSongs = songs.filter(s => !canAccess(s, user));
+        const updatedUserSongs = songData.map(s => ({
+          ...s,
+          userId: s.userId || user.id || user.username,
+          username: s.username || user.username
+        }));
+        const allSongs = [...otherSongs, ...updatedUserSongs];
+        writeJSON(SONGS_FILE, allSongs);
         broadcastState();
-        return sendJSON(res, 200, { success: true, count: songData.length });
+        return sendJSON(res, 200, { success: true, count: updatedUserSongs.length });
       }
 
       // Single Song Creation
@@ -387,6 +444,8 @@ const server = http.createServer(async (req, res) => {
 
       const newSong = {
         id: songData.id || `song_${Date.now()}`,
+        userId: user.id || user.username,
+        username: user.username,
         title: songData.title.trim(),
         artist: (songData.artist || '').trim(),
         lines: songData.lines
@@ -406,12 +465,21 @@ const server = http.createServer(async (req, res) => {
   if (songIdMatch && req.method === 'PUT') {
     const id = songIdMatch[1];
     try {
+      const user = getSessionUser(req);
+      if (!user) {
+        return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+      }
+
       const updatedData = await parseBody(req);
       const songs = readJSON(SONGS_FILE, []);
       const index = songs.findIndex(s => s.id === id);
 
       if (index === -1) {
         return sendJSON(res, 404, { error: 'Lagu tidak ditemukan!' });
+      }
+
+      if (!canAccess(songs[index], user)) {
+        return sendJSON(res, 403, { error: 'Anda tidak memiliki hak akses ke lagu ini!' });
       }
 
       songs[index] = {
@@ -422,6 +490,9 @@ const server = http.createServer(async (req, res) => {
       };
 
       writeJSON(SONGS_FILE, songs);
+      if (appState.currentSongId === id) {
+        appState.currentSong = songs[index];
+      }
       broadcastState();
       return sendJSON(res, 200, { success: true, song: songs[index] });
     } catch (err) {
@@ -432,20 +503,30 @@ const server = http.createServer(async (req, res) => {
   // DELETE /api/songs/:id
   if (songIdMatch && req.method === 'DELETE') {
     const id = songIdMatch[1];
-    let songs = readJSON(SONGS_FILE, []);
-    const filtered = songs.filter(s => s.id !== id);
+    const user = getSessionUser(req);
+    if (!user) {
+      return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+    }
 
-    if (filtered.length === songs.length) {
+    let songs = readJSON(SONGS_FILE, []);
+    const song = songs.find(s => s.id === id);
+
+    if (!song) {
       return sendJSON(res, 404, { error: 'Lagu tidak ditemukan!' });
     }
 
+    if (!canAccess(song, user)) {
+      return sendJSON(res, 403, { error: 'Anda tidak memiliki hak akses untuk menghapus lagu ini!' });
+    }
+
+    const filtered = songs.filter(s => s.id !== id);
     writeJSON(SONGS_FILE, filtered);
 
-    // Also remove from any playlist
+    // Also remove from user's playlists
     const playlists = readJSON(PLAYLISTS_FILE, []);
     let plChanged = false;
     playlists.forEach(pl => {
-      if (pl.songIds && pl.songIds.includes(id)) {
+      if (canAccess(pl, user) && pl.songIds && pl.songIds.includes(id)) {
         pl.songIds = pl.songIds.filter(sid => sid !== id);
         plChanged = true;
       }
@@ -457,15 +538,25 @@ const server = http.createServer(async (req, res) => {
   }
 
   // -------------------------------------------------------------
-  // PLAYLISTS CRUD APIS
+  // PLAYLISTS CRUD APIS (USER-SCOPED)
   // -------------------------------------------------------------
   if (pathname === '/api/playlists' && req.method === 'GET') {
+    const user = getSessionUser(req);
+    if (!user) {
+      return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+    }
     const playlists = readJSON(PLAYLISTS_FILE, []);
-    return sendJSON(res, 200, playlists);
+    const userPlaylists = playlists.filter(pl => canAccess(pl, user));
+    return sendJSON(res, 200, userPlaylists);
   }
 
   if (pathname === '/api/playlists' && req.method === 'POST') {
     try {
+      const user = getSessionUser(req);
+      if (!user) {
+        return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+      }
+
       const plData = await parseBody(req);
       if (!plData.name) {
         return sendJSON(res, 400, { error: 'Nama playlist wajib diisi!' });
@@ -474,6 +565,8 @@ const server = http.createServer(async (req, res) => {
       const playlists = readJSON(PLAYLISTS_FILE, []);
       const newPlaylist = {
         id: `pl_${Date.now()}`,
+        userId: user.id || user.username,
+        username: user.username,
         name: plData.name.trim(),
         description: (plData.description || '').trim(),
         songIds: Array.isArray(plData.songIds) ? plData.songIds : [],
@@ -494,12 +587,21 @@ const server = http.createServer(async (req, res) => {
   if (plIdMatch && req.method === 'PUT') {
     const id = plIdMatch[1];
     try {
+      const user = getSessionUser(req);
+      if (!user) {
+        return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+      }
+
       const updatedData = await parseBody(req);
       const playlists = readJSON(PLAYLISTS_FILE, []);
       const index = playlists.findIndex(p => p.id === id);
 
       if (index === -1) {
         return sendJSON(res, 404, { error: 'Playlist tidak ditemukan!' });
+      }
+
+      if (!canAccess(playlists[index], user)) {
+        return sendJSON(res, 403, { error: 'Anda tidak memiliki hak akses ke playlist ini!' });
       }
 
       playlists[index] = {
@@ -520,16 +622,26 @@ const server = http.createServer(async (req, res) => {
   // DELETE /api/playlists/:id
   if (plIdMatch && req.method === 'DELETE') {
     const id = plIdMatch[1];
-    let playlists = readJSON(PLAYLISTS_FILE, []);
-    const filtered = playlists.filter(p => p.id !== id);
+    const user = getSessionUser(req);
+    if (!user) {
+      return sendJSON(res, 401, { error: 'Sesi telah berakhir atau belum login' });
+    }
 
-    if (filtered.length === playlists.length) {
+    let playlists = readJSON(PLAYLISTS_FILE, []);
+    const pl = playlists.find(p => p.id === id);
+
+    if (!pl) {
       return sendJSON(res, 404, { error: 'Playlist tidak ditemukan!' });
     }
 
+    if (!canAccess(pl, user)) {
+      return sendJSON(res, 403, { error: 'Anda tidak memiliki hak akses untuk menghapus playlist ini!' });
+    }
+
+    const filtered = playlists.filter(p => p.id !== id);
     writeJSON(PLAYLISTS_FILE, filtered);
     if (appState.activePlaylistId === id) {
-      appState.activePlaylistId = filtered.length > 0 ? filtered[0].id : '';
+      appState.activePlaylistId = '';
     }
     broadcastState();
     return sendJSON(res, 200, { success: true, remaining: filtered.length });

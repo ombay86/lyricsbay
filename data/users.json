@@ -16,5 +16,23 @@
     "salt": "3dba824e9809d3339ec39dd398c13d35",
     "hash": "fde044ab4b9c787f03f533546a0a6e9636559e1c2255985c4ca26b288b56ad2e07050feadce481733b08a18e2a78ee4af242eef2c8276d7c9f6bf9b3b15719be",
     "createdAt": "2026-09-25T07:01:22.509Z"
+  },
+  {
+    "id": "usr_gms",
+    "username": "gms",
+    "name": "GMS Community",
+    "role": "operator",
+    "salt": "de72ef89a5e29cf339734cc5de1a9411",
+    "hash": "b55dc1c218da27f0b979100d9c36325e47a27272a0eb98aa21f2b294272b49658cbac8bfc16ba83c203610689e25b6fa0fb527f197206a701bdb9dff435c50ed",
+    "createdAt": "2026-09-25T10:53:57.845Z"
+  },
+  {
+    "id": "usr_gmsco",
+    "username": "gmsco",
+    "name": "GMS Consolidate",
+    "role": "operator",
+    "salt": "b5492a859ed7306aa6b064a82077b005",
+    "hash": "0ac13995e7bfba5e843afda4067991dc731c3c5e4756e64b3c34bfd94cb612f5611f6d1d232bfff58186ad1fe8dd715316c506d5e1ba779bc3d611f08c3ddd6e",
+    "createdAt": "2026-09-25T10:53:57.845Z"
   }
 ]

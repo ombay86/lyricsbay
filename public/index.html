@@ -1613,12 +1613,38 @@
   <!-- ========================================================= -->
   <script>
     // App State
-    let authToken = localStorage.getItem('lyric_auth_token') || null;
+    let authToken = localStorage.getItem('lyric_auth_token') || localStorage.getItem('lyricsbay_token') || null;
     let currentUser = null;
     let songs = [];
     let playlists = [];
     let selectedPlaylistId = 'pl_1';
     let filteredLiveSongs = [];
+
+    function setToken(token) {
+      authToken = token;
+      if (token) {
+        localStorage.setItem('lyric_auth_token', token);
+        localStorage.setItem('lyricsbay_token', token);
+      } else {
+        localStorage.removeItem('lyric_auth_token');
+        localStorage.removeItem('lyricsbay_token');
+      }
+    }
+
+    async function authFetch(url, options = {}) {
+      options.headers = options.headers || {};
+      if (authToken) {
+        options.headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      const res = await fetch(url, options);
+      if (res.status === 401 && !url.includes('/api/auth/login') && !url.includes('/api/auth/sso-verify')) {
+        console.warn('Unauthorized request, redirecting to login:', url);
+        setToken(null);
+        currentUser = null;
+        showLogin();
+      }
+      return res;
+    }
 
     let state = {
       currentSongIndex: 0,
@@ -1680,9 +1706,8 @@
           });
           const ssoData = await ssoRes.json();
           if (ssoRes.ok && ssoData.success) {
-            authToken = ssoData.token;
+            setToken(ssoData.token);
             currentUser = ssoData.user;
-            localStorage.setItem('lyricsbay_token', authToken);
             // Clean URL param
             window.history.replaceState({}, document.title, window.location.pathname);
             showApp();
@@ -1699,9 +1724,7 @@
       }
 
       try {
-        const res = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
+        const res = await authFetch('/api/auth/me');
         const data = await res.json();
         if (res.ok && data.user) {
           currentUser = data.user;
@@ -1741,9 +1764,8 @@
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          authToken = data.token;
+          setToken(data.token);
           currentUser = data.user;
-          localStorage.setItem('lyric_auth_token', authToken);
           showApp();
         } else {
           loginAlert.textContent = data.error || 'Username atau password salah!';
@@ -1757,12 +1779,8 @@
 
     btnLogout.addEventListener('click', async () => {
       if (confirm('Apakah Anda yakin ingin keluar?')) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        localStorage.removeItem('lyric_auth_token');
-        authToken = null;
+        await authFetch('/api/auth/logout', { method: 'POST' });
+        setToken(null);
         currentUser = null;
         showLogin();
       }
@@ -1790,17 +1808,19 @@
     async function loadAllData() {
       try {
         const [songsRes, plRes, stateRes] = await Promise.all([
-          fetch('/api/songs'),
-          fetch('/api/playlists'),
-          fetch('/api/state')
+          authFetch('/api/songs'),
+          authFetch('/api/playlists'),
+          authFetch('/api/state')
         ]);
 
-        songs = await songsRes.json();
-        playlists = await plRes.json();
-        state = await stateRes.json();
+        if (songsRes.ok) songs = await songsRes.json();
+        if (plRes.ok) playlists = await plRes.json();
+        if (stateRes.ok) state = await stateRes.json();
 
-        if (state.activePlaylistId) {
+        if (state.activePlaylistId && playlists.some(p => p.id === state.activePlaylistId)) {
           selectedPlaylistId = state.activePlaylistId;
+        } else {
+          selectedPlaylistId = playlists[0] ? playlists[0].id : 'all';
         }
 
         populatePlaylistDropdown();
@@ -1876,9 +1896,16 @@
 
     function renderLyricsList() {
       lyricsList.innerHTML = '';
-      if (!filteredLiveSongs || filteredLiveSongs.length === 0) return;
+      if (!filteredLiveSongs || filteredLiveSongs.length === 0) {
+        lyricsList.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">Belum ada lagu di library/playlist ini. Tambahkan lagu di tab <b>Kelola Lagu</b>.</div>';
+        lineCounter.textContent = 'Baris 0 / 0';
+        return;
+      }
       const curSong = filteredLiveSongs[state.currentSongIndex];
-      if (!curSong || !curSong.lines) return;
+      if (!curSong || !curSong.lines) {
+        lineCounter.textContent = 'Baris 0 / 0';
+        return;
+      }
 
       lineCounter.textContent = `Baris ${state.currentLineIndex + 1} / ${curSong.lines.length}`;
 
@@ -1917,7 +1944,7 @@
       applyLocalUI();
 
       try {
-        await fetch('/api/state', {
+        await authFetch('/api/state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(state)
@@ -2130,14 +2157,14 @@
       try {
         if (id) {
           // Update
-          await fetch(`/api/songs/${id}`, {
+          await authFetch(`/api/songs/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
         } else {
           // Create
-          await fetch('/api/songs', {
+          await authFetch('/api/songs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -2157,7 +2184,7 @@
       if (!confirm(`Hapus lagu "${song.title}"?`)) return;
 
       try {
-        await fetch(`/api/songs/${id}`, { method: 'DELETE' });
+        await authFetch(`/api/songs/${id}`, { method: 'DELETE' });
         await loadAllData();
       } catch (err) {
         alert('Gagal menghapus lagu: ' + err.message);
@@ -2246,7 +2273,7 @@
       pl.songIds[idx] = pl.songIds[targetIdx];
       pl.songIds[targetIdx] = temp;
 
-      await fetch(`/api/playlists/${pl.id}`, {
+      await authFetch(`/api/playlists/${pl.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ songIds: pl.songIds })
@@ -2264,7 +2291,7 @@
       if (!pl) return;
 
       pl.songIds = pl.songIds.filter(id => id !== sid);
-      await fetch(`/api/playlists/${pl.id}`, {
+      await authFetch(`/api/playlists/${pl.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ songIds: pl.songIds })
@@ -2294,7 +2321,7 @@
       }
       if (!confirm(`Hapus playlist "${curPlaylistTitle.textContent}"?`)) return;
 
-      await fetch(`/api/playlists/${currentEditingPlaylistId}`, { method: 'DELETE' });
+      await authFetch(`/api/playlists/${currentEditingPlaylistId}`, { method: 'DELETE' });
       await loadAllData();
       currentEditingPlaylistId = playlists[0] ? playlists[0].id : 'all';
       renderPlaylistsView();
@@ -2348,14 +2375,14 @@
       try {
         if (id) {
           // Update existing playlist
-          await fetch(`/api/playlists/${id}`, {
+          await authFetch(`/api/playlists/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, description })
           });
         } else {
           // Create new playlist
-          const res = await fetch('/api/playlists', {
+          const res = await authFetch('/api/playlists', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, description, songIds: [] })
@@ -2422,7 +2449,7 @@
         .map(cb => cb.value);
 
       pl.songIds = checkedIds;
-      await fetch(`/api/playlists/${pl.id}`, {
+      await authFetch(`/api/playlists/${pl.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ songIds: checkedIds })
