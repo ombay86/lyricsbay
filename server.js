@@ -403,8 +403,18 @@ const server = http.createServer(async (req, res) => {
       const userSongs = songs.filter(s => canAccess(s, user));
       return sendJSON(res, 200, userSongs);
     } else {
-      // Unauthenticated (vMix overlay or public preview):
-      // Return ONLY the currently live song so overlay functions without exposing libraries
+      // Unauthenticated (vMix overlay or public preview iframe):
+      // Return all songs of the currently active live playlist so overlay has them cached
+      const playlists = readJSON(PLAYLISTS_FILE, []);
+      const activePl = playlists.find(p => p.id === appState.activePlaylistId) || playlists[0];
+      if (activePl && Array.isArray(activePl.songIds) && activePl.songIds.length > 0) {
+        const liveSongs = activePl.songIds
+          .map(id => songs.find(s => s.id === id))
+          .filter(Boolean);
+        if (liveSongs.length > 0) {
+          return sendJSON(res, 200, liveSongs);
+        }
+      }
       if (appState.currentSong) {
         return sendJSON(res, 200, [appState.currentSong]);
       }

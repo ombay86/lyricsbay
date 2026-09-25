@@ -233,14 +233,16 @@
 
     async function loadSongs() {
       try {
-        const res = await fetch('/api/songs');
-        songs = await res.json();
-        
         const stateRes = await fetch('/api/state');
         state = await stateRes.json();
 
         if (state.settings) {
           applySettingsToCSS(state.settings);
+        }
+
+        const res = await fetch('/api/songs');
+        if (res.ok) {
+          songs = await res.json();
         }
 
         renderLyrics();
@@ -252,12 +254,17 @@
     }
 
     function getCurrentSong() {
-      if (!songs || songs.length === 0) return null;
-      if (state.currentSongId) {
-        const found = songs.find(s => s.id === state.currentSongId);
-        if (found) return found;
+      if (state.currentSong && Array.isArray(state.currentSong.lines) && state.currentSong.lines.length > 0) {
+        return state.currentSong;
       }
-      return songs[state.currentSongIndex || 0] || null;
+      if (songs && songs.length > 0) {
+        if (state.currentSongId) {
+          const found = songs.find(s => s.id === state.currentSongId);
+          if (found) return found;
+        }
+        return songs[state.currentSongIndex || 0] || null;
+      }
+      return null;
     }
 
     function renderLyrics() {
@@ -285,6 +292,11 @@
         track.classList.add('blank');
       } else {
         track.classList.remove('blank');
+      }
+
+      if (track.children.length === 0) {
+        renderLyrics();
+        void track.offsetHeight;
       }
 
       const lineElements = track.querySelectorAll('.lyric-line');
@@ -329,7 +341,8 @@
         try {
           const newState = JSON.parse(e.data);
           const songChanged = (newState.currentSongId && newState.currentSongId !== state.currentSongId) || 
-                              (newState.currentSongIndex !== state.currentSongIndex);
+                              (newState.currentSongIndex !== state.currentSongIndex) ||
+                              (newState.currentSong && (!state.currentSong || newState.currentSong.id !== state.currentSong.id));
           
           if (newState.settings) {
             applySettingsToCSS(newState.settings);

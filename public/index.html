@@ -2012,13 +2012,15 @@
         const targetSong = filteredLiveSongs[index];
         state.currentSongId = targetSong ? targetSong.id : null;
         state.currentLineIndex = 0;
+        state.currentSong = targetSong;
         ctrlSongSelect.value = index;
         renderLyricsList();
         updateServerState({
           currentSongIndex: index,
           currentSongId: state.currentSongId,
           currentLineIndex: 0,
-          isBlank: false
+          isBlank: false,
+          currentSong: targetSong
         });
       }
     }
